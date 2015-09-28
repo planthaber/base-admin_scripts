@@ -2,6 +2,7 @@ require 'rock/doc'
 require 'utilrb/logger'
 require 'metaruby/gui'
 require 'orogen/html'
+require 'set'
 
 module Rock
     module Doc
@@ -352,7 +353,7 @@ module Rock
                         PackageDirectory.debug "ignoring #{type.name}: is an array"
                         nil
                     end
-                end.compact.to_value_set
+                end.compact.to_set
 
                 @orogen_type_vizkit = Hash.new { |h, k| h[k] = Array.new }
                 @orogen_type_vizkit3d = Hash.new { |h, k| h[k] = Array.new }
