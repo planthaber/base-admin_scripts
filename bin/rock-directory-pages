@@ -7,7 +7,7 @@ PAGES_DIR = File.join(base_dir, 'rock', 'pages', 'package_directory')
 ENV['VIZKIT_NO_GUI'] = '1'
 
 require 'autoproj'
-require 'autoproj/cmdline'
+require 'autoproj/cli/inspection_tool'
 require 'rock/package_directory'
 require 'optparse'
 
@@ -36,9 +36,9 @@ if !output_dir
     exit 1
 end
 
-Autoproj.silent do
-    Autoproj::CmdLine.initialize_and_load([])
-end
+#Autoproj.silent do
+#    Autoproj::CLI::InspectionTool.initialize_and_load([])
+#end
 require 'orocos'
 Orocos.load
 
@@ -52,7 +52,7 @@ package_directory.render_autoproj_osdeps
 package_directory.render_orogen_types
 package_directory.render_orogen_tasks
 
-initial_flavor = YAML.load(File.read(File.join("autoproj", "config.yml")))['ROCK_FLAVOR']
+initial_flavor = YAML.load(File.read(File.join(".autoproj", "config.yml")))['ROCK_FLAVOR']
 
 ret_code = 0
 begin
