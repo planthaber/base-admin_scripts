@@ -2,6 +2,7 @@ require 'rock/doc'
 require 'utilrb/logger'
 require 'metaruby/gui'
 require 'orogen/html'
+require 'set'
 
 module Rock
     module Doc
@@ -325,36 +326,37 @@ module Rock
                 end.compact
 
                 if loader.available_types != nil 
-                    @orogen_types = loader.available_types.keys.sort.map do |type_name|
-                        begin
-                            PackageDirectory.debug "loading typekit for #{type_name}"
-                            typekit = loader.typekit_for(type_name, false)
-                        rescue Interrupt; raise
-                        rescue Exception => e
-                            PackageDirectory.warn "cannot load typekit for #{type_name}: #{e.message}"
-                            next
-                        end
-    
-                        begin
-                            type = loader.resolve_type(type_name)
-                        rescue Typelib::NotFound => e
-                            PackageDirectory.warn "Could not load typekit for #{type_name}, but it was supposed to be defined in #{typekit.name}"
-                            PackageDirectory.warn "   #{e.message}"
-                            next
-                            #raise e #TODO add this see bug https://rock.opendfki.de/ticket/443#ticket
-                        end
-    
-                        if loader.m_type?(type) && (loader.opaque_type_for(type) != type)
-                            PackageDirectory.debug "ignoring #{type_name}: is an m-type"
-                            next
-                        elsif !(type <= Typelib::ArrayType)
-                            type
-                        else
-                            PackageDirectory.debug "ignoring #{type.name}: is an array"
-                            nil
-                        end
-                    end.compact.to_value_set
+		        @orogen_types = loader.available_types.keys.sort.map do |type_name|
+		            begin
+		                PackageDirectory.debug "loading typekit for #{type_name}"
+		                typekit = loader.typekit_for(type_name, false)
+		            rescue Interrupt; raise
+		            rescue Exception => e
+		                PackageDirectory.warn "cannot load typekit for #{type_name}: #{e.message}"
+		                next
+		            end
+
+		            begin
+		                type = loader.resolve_type(type_name)
+		            rescue Typelib::NotFound => e
+		                PackageDirectory.warn "Could not load typekit for #{type_name}, but it was supposed to be defined in #{typekit.name}"
+		                PackageDirectory.warn "   #{e.message}"
+		                next
+		                #raise e #TODO add this see bug https://rock.opendfki.de/ticket/443#ticket
+		            end
+
+		            if loader.m_type?(type) && (loader.opaque_type_for(type) != type)
+		                PackageDirectory.debug "ignoring #{type_name}: is an m-type"
+		                next
+		            elsif !(type <= Typelib::ArrayType)
+		                type
+		            else
+		                PackageDirectory.debug "ignoring #{type.name}: is an array"
+		                nil
+		            end
+		        end.compact.to_set
                 end
+
 
                 @orogen_type_vizkit = Hash.new { |h, k| h[k] = Array.new }
                 @orogen_type_vizkit3d = Hash.new { |h, k| h[k] = Array.new }
